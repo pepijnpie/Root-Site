@@ -2,7 +2,9 @@
 
 Fan-made tools for *Root: The Roleplaying Game*, styled after the books.
 
-**Now:** Equipment creator — wear, ranges, weapon skill tags and all tags from the core book and *Travelers & Outsiders*. Value and Load follow the book's formula (Boxes of Wear + Extra Ranges + Special Tags + Weapon Move Tags − Flaw Tags). Cards look like the entries in the books' equipment lists.
+**Now:** Equipment creator — wear, ranges, weapon skill tags and all tags from the core book, *Travelers & Outsiders* and *Ruins & Expeditions* (113 tags, 63 pre-made items). Value and Load follow the book's formula (Boxes of Wear + Extra Ranges + Special Tags + Weapon Move Tags − Flaw Tags). Cards look like the entries in the books' equipment lists.
+
+House rules: no "cannot pair with" conflicts, no boss tags, and every tag is worth 1-Value (so Ripper and Specialized count 1 although the book prices them at 2). Book exceptions that stay: Luxury +4 in total, Makeshift −2, Loose Weave −2, Borrowed −6. A few pre-made items print a Value in the book that does not follow the book's own formula (Acute Razor, Ratfolk Saber, Keepers' Cuirass); the site shows the computed Value and says so under the card.
 
 **Later:** character maker and more.
 
@@ -28,4 +30,4 @@ Open `index.html?selftest` to check every pre-made item against the Value printe
 
 ## Credits
 
-*Root: The Roleplaying Game* and *Travelers & Outsiders* are by Magpie Games and Leder Games. This is an unofficial fan tool; rules text, tags and artwork belong to their creators.
+*Root: The Roleplaying Game* and its supplements *Travelers & Outsiders* and *Ruins & Expeditions* are by Magpie Games and Leder Games. This is an unofficial fan tool; rules text, tags and artwork belong to their creators.

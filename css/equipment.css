@@ -52,7 +52,7 @@
   cursor: pointer;
 }
 .trow label:hover { background: rgba(255, 255, 255, .34); }
-.trow input { position: absolute; opacity: 0; pointer-events: none; }
+.trow input[type="checkbox"] { position: absolute; opacity: 0; pointer-events: none; }
 .trow .ic { width: 21px; height: 21px; margin-top: 2px; }
 .trow .tn { font-weight: 700; font-variant: small-caps; letter-spacing: .03em; font-size: 1.06em; }
 .trow .ap { color: #5b5346; }
@@ -70,8 +70,25 @@
   background: rgba(255, 255, 255, .45);
   white-space: nowrap;
 }
-.trow.on label { background: linear-gradient(90deg, rgba(217, 201, 122, .36), rgba(217, 201, 122, .1)); box-shadow: inset 4px 0 0 var(--bar); }
+.trow.on { background: linear-gradient(90deg, rgba(217, 201, 122, .36), rgba(217, 201, 122, .1)); box-shadow: inset 4px 0 0 var(--bar); }
 .trow.on .state { background: var(--bar); border-color: var(--bar); color: #f7f2e6; }
+.trow .tx { display: block; }
+.trow .extra { display: none; flex-wrap: wrap; align-items: center; gap: 8px 22px; padding: 0 12px 12px 46px; }
+.trow.on .extra { display: flex; }
+.tnote-l { display: flex; align-items: center; gap: 8px; flex: 1 1 240px; font: 700 .82rem/1.2 var(--sans); color: var(--bar); }
+.tnote-l input { padding: 6px 9px; font-size: .9rem; }
+.tstack { display: inline-flex; align-items: center; gap: 8px; font: 700 .82rem/1 var(--sans); color: var(--bar); }
+.tstack button {
+  width: 28px; height: 28px;
+  font: 700 1rem/1 var(--sans);
+  color: var(--bar);
+  background: rgba(255, 255, 255, .5);
+  border: 1px solid var(--gold-deep);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.tstack button:hover { background: rgba(255, 255, 255, .85); }
+.tstack output { min-width: 2.4ch; text-align: center; font-size: .95rem; }
 .trow .tact { display: flex; gap: 8px; padding: 0 12px 10px 46px; }
 .trow .tact button { font: 600 .82rem/1 var(--sans); color: var(--bar); background: none; border: 0; padding: 4px 0; text-decoration: underline; cursor: pointer; }
 
@@ -107,6 +124,7 @@ details.own[open] > summary { border-bottom: 1px solid var(--gold); }
 
 .flow { column-width: 340px; column-gap: 40px; }
 .entry { break-inside: avoid; page-break-inside: avoid; margin: 0 0 30px; }
+.lib-note { margin: 8px 12px 0; font: italic .82rem/1.4 var(--sans); color: var(--muted); }
 .entry-actions { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 6px 12px 0; }
 .entry-actions button { font: 700 .82rem/1 var(--sans); color: var(--bar); background: none; border: 0; padding: 6px 0; text-decoration: underline; cursor: pointer; }
 .entry-actions button.danger { color: var(--red); }

@@ -31,12 +31,26 @@
     });
   }
   /* *italic* and **bold** in tag text */
-  function rich(s) {
+  function inline(s) {
     return esc(s)
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.+?)\*/g, "<em>$1</em>");
   }
-  function plainText(s) { return String(s).replace(/\*+/g, ""); }
+  /* a tag text can run over several lines; a line starting with "- " is a bullet */
+  function rich(s) {
+    var lines = String(s).split("\n");
+    if (lines.length === 1) return inline(s);
+    return lines.map(function (line, i) {
+      if (/^- /.test(line)) return '<span class="bl">' + inline(line.slice(2)) + "</span>";
+      return i ? '<span class="ln">' + inline(line) + "</span>" : inline(line);
+    }).join("");
+  }
+  function plainText(s) { return String(s).replace(/\*+/g, "").replace(/\n- /g, "\n  • "); }
+  /* tag name as printed on a card: "Ensigiled (Lizard Cult)" */
+  function tagLabel(item, t) {
+    var note = item.notes && item.notes[t.id];
+    return t.name + (note ? " (" + note + ")" : "");
+  }
 
   function load(key, fallback) {
     try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -50,7 +64,7 @@
   /* ------------------------------------------------------------------ state */
 
   function blank() {
-    return { name: "", type: "weapon", wear: 2, marked: 0, load: 1, ranges: [], skills: [], tags: [] };
+    return { name: "", type: "weapon", wear: 2, marked: 0, load: 1, ranges: [], skills: [], tags: [], notes: {}, counts: {} };
   }
 
   function sanitize(it) {
@@ -72,6 +86,14 @@
     }
     o.skills = strings(it.skills);
     o.tags = strings(it.tags);
+    // per-tag label ("Lizard Cult") and how often a stackable tag is applied
+    var notes = it.notes && typeof it.notes === "object" ? it.notes : {};
+    var counts = it.counts && typeof it.counts === "object" ? it.counts : {};
+    o.tags.forEach(function (id) {
+      if (typeof notes[id] === "string" && notes[id].trim()) o.notes[id] = notes[id].trim().slice(0, 60);
+      var c = parseInt(counts[id], 10);
+      if (c >= 2 && c <= 6) o.counts[id] = c;
+    });
     return o;
   }
 
@@ -91,10 +113,10 @@
   var editingId = saved && saved.editing && items.some(function (i) { return i.id === saved.editing; }) ? saved.editing : null;
 
   var filter = "all", query = "", libSrc = "core", ownKind = "pos", editingTagId = null;
-  var tagIndex = {};
+  var tagIndex = Object.create(null);
 
   function rebuildTagIndex() {
-    tagIndex = {};
+    tagIndex = Object.create(null);
     D.tags.concat(custom).forEach(function (t) { tagIndex[t.id] = t; });
   }
   rebuildTagIndex();
@@ -113,7 +135,8 @@
     item.tags.forEach(function (id) {
       var t = tagIndex[id];
       if (!t) return;
-      if (t.value > 0) special += t.value; else flaws += -t.value;
+      var n = t.stack ? (item.counts && item.counts[id]) || 1 : 1;
+      if (t.value > 0) special += t.value * n; else flaws += -t.value * n;
       if (t.load === "zero") light = true; else if (t.load) loadAdj += t.load;
     });
 
@@ -157,7 +180,7 @@
     var ordered = picked.filter(function (t) { return t.kind === "pos"; })
       .concat(picked.filter(function (t) { return t.kind === "neg"; }));
     var tags = ordered.map(function (t) {
-      return '<div class="eq-tag"><i class="ic ' + t.kind + '"></i><b>' + esc(t.name) + "</b>: " + rich(t.text) + "</div>";
+      return '<div class="eq-tag"><i class="ic ' + t.kind + '"></i><b>' + esc(tagLabel(item, t)) + "</b>: " + rich(t.text) + "</div>";
     }).join("");
     if (!tags && o.hint) tags = '<p class="eq-empty">No tags yet. Pick some below.</p>';
 
@@ -182,7 +205,7 @@
     var picked = item.tags.map(function (id) { return tagIndex[id]; }).filter(Boolean);
     picked.filter(function (t) { return t.kind === "pos"; })
       .concat(picked.filter(function (t) { return t.kind === "neg"; }))
-      .forEach(function (t) { lines.push((t.kind === "pos" ? "(+) " : "(" + MINUS + ") ") + t.name + ": " + plainText(t.text)); });
+      .forEach(function (t) { lines.push((t.kind === "pos" ? "(+) " : "(" + MINUS + ") ") + tagLabel(item, t) + ": " + plainText(t.text)); });
     return lines.join("\n");
   }
 
@@ -280,6 +303,7 @@
     if (filter === "neg" && t.kind !== "neg") return false;
     if (filter === "core" && t.src !== "core") return false;
     if (filter === "sup" && t.src !== "sup") return false;
+    if (filter === "rne" && t.src !== "rne") return false;
     if (filter === "custom" && t.src !== "custom") return false;
     if (filter === "picked" && draft.tags.indexOf(t.id) < 0) return false;
     var q = query.trim().toLowerCase();
@@ -290,7 +314,20 @@
   function tagRow(t) {
     var on = draft.tags.indexOf(t.id) >= 0;
     var v = Math.abs(t.value);
-    var vnote = t.vnote || (v !== 1 && t.src === "custom" ? "Counts as " + (t.value > 0 ? "+" : MINUS) + v + " Value." : "");
+    var vnote = t.vnote || (v !== 1 ? "Counts as " + (t.value > 0 ? "+" : MINUS) + v + " Value." : "");
+
+    // a label for the card ("Ensigiled (Lizard Cult)") and, for Contraband, how many times it applies
+    var extra = "";
+    if (t.detail) {
+      extra += '<div class="tnote-l"><span>' + esc(t.detail) + '</span><input type="text" class="tnote" maxlength="60" ' +
+        'aria-label="' + esc(t.detail + " for " + t.name) + '" placeholder="optional" value="' + esc(draft.notes[t.id] || "") + '"></div>';
+    }
+    if (t.stack) {
+      extra += '<div class="tstack"><span>Applied</span>' +
+        '<button type="button" data-act="stack-dec" aria-label="Apply ' + esc(t.name) + ' once less">' + MINUS + "</button>" +
+        "<output>" + (draft.counts[t.id] || 1) + "×</output>" +
+        '<button type="button" data-act="stack-inc" aria-label="Apply ' + esc(t.name) + ' once more">+</button></div>';
+    }
     return '<div class="trow ' + t.kind + (on ? " on" : "") + '" data-id="' + esc(t.id) + '">' +
       "<label>" +
         '<input type="checkbox"' + (on ? " checked" : "") + ">" +
@@ -301,6 +338,7 @@
           '<span class="src">' + esc(srcLabel(t)) + "</span></span>" +
         '<span class="state">' + (on ? "Added" : "Add") + "</span>" +
       "</label>" +
+      (extra ? '<div class="extra">' + extra + "</div>" : "") +
       (t.src === "custom"
         ? '<div class="tact"><button type="button" data-act="edit-tag">Edit</button><button type="button" data-act="del-tag">Delete</button></div>'
         : "") +
@@ -590,11 +628,22 @@
 
   function presetItem(p) {
     return { name: p.name, type: p.type, wear: p.wear, marked: 0, load: p.load,
-             ranges: p.ranges.slice(), skills: p.skills.slice(), tags: p.tags.slice() };
+             ranges: p.ranges.slice(), skills: p.skills.slice(), tags: p.tags.slice(),
+             notes: clone(p.notes || {}), counts: clone(p.counts || {}) };
+  }
+
+  /* a remark under a pre-made card when the book itself is not consistent */
+  function libNote(p) {
+    if (p.note) return p.note;
+    if (p.off) {
+      return "The book prints Value " + p.book + " here, but by the book’s own formula this item comes to " +
+        calc(presetItem(p)).value + ", so that is what the site shows.";
+    }
+    return "";
   }
 
   function renderLibrary() {
-    segment($("lib-tabs"), [["core", "Core book"], ["sup", "Travelers & Outsiders"]],
+    segment($("lib-tabs"), [["core", "Core book"], ["sup", "Travelers & Outsiders"], ["rne", "Ruins & Expeditions"]],
       function (v) { return libSrc === v; },
       function (v) { libSrc = v; renderLibrary(); });
 
@@ -603,7 +652,9 @@
       var list = D.presets.filter(function (p) { return p.src === libSrc && p.group === g; });
       if (!list.length) return;
       html += '<div class="lib-group"><h3>' + g + '</h3><div class="flow">' + list.map(function (p) {
+        var note = libNote(p);
         return '<div class="entry" data-preset="' + esc(p.id) + '">' + cardHTML(presetItem(p)) +
+          (note ? '<p class="lib-note">' + esc(note) + "</p>" : "") +
           '<div class="entry-actions">' +
             '<button type="button" data-act="use">Use as template</button>' +
             '<button type="button" data-act="add">Add to my list</button>' +
@@ -660,6 +711,19 @@
       var id = e.target.closest(".trow").dataset.id;
       if (act === "edit-tag") editOwnTag(id);
       if (act === "del-tag") deleteOwnTag(id);
+      if (act === "stack-inc" || act === "stack-dec") {
+        var n = clamp((draft.counts[id] || 1) + (act === "stack-inc" ? 1 : -1), 1, 6);
+        if (n > 1) draft.counts[id] = n; else delete draft.counts[id];
+        e.target.parentNode.querySelector("output").textContent = n + "×";
+        refresh();
+      }
+    });
+    $("tag-list").addEventListener("input", function (e) {
+      if (!e.target.classList.contains("tnote")) return;
+      var id = e.target.closest(".trow").dataset.id;
+      var v = e.target.value.trim();
+      if (v) draft.notes[id] = v.slice(0, 60); else delete draft.notes[id];
+      refresh();
     });
 
     $("own-form").addEventListener("submit", saveOwnTag);
@@ -692,14 +756,21 @@
 
   function selfTest() {
     var bad = [];
+    var known = [];   // items where the book's printed Value does not follow its own formula
     D.presets.forEach(function (p) {
       var got = calc(presetItem(p)).value;
-      if (got !== p.book) bad.push(p.name + ": app " + got + " vs book " + p.book);
+      if (p.off) known.push(p.name + ": book " + p.book + ", tags add up to " + got);
+      else if (got !== p.book) bad.push(p.name + ": app " + got + " vs book " + p.book);
       p.tags.forEach(function (id) { if (!tagIndex[id]) bad.push(p.name + ": unknown tag " + id); });
+      Object.keys(p.notes || {}).concat(Object.keys(p.counts || {})).forEach(function (id) {
+        if (p.tags.indexOf(id) < 0) bad.push(p.name + ": note/count for a tag it does not have: " + id);
+      });
     });
+    var ids = {};
+    D.tags.forEach(function (t) { if (ids[t.id]) bad.push("duplicate tag id " + t.id); ids[t.id] = 1; });
     var out = document.createElement("pre");
     out.id = "selftest";
-    out.textContent = JSON.stringify({ presets: D.presets.length, tags: D.tags.length, mismatches: bad });
+    out.textContent = JSON.stringify({ presets: D.presets.length, tags: D.tags.length, mismatches: bad, bookInconsistent: known });
     document.body.appendChild(out);
   }
 
