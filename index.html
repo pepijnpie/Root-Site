@@ -23,7 +23,7 @@
       <a class="on" href="./" aria-current="page">Equipment</a>
       <span class="soon">Characters <small>soon</small></span>
     </nav>
-    <p class="lede">Build a piece of equipment with the wear, ranges, weapon skill tags and tags from the core book, <em>Travelers &amp; Outsiders</em> and <em>Ruins &amp; Expeditions</em>. Value and Load are worked out with the book’s formula, and the result looks like an entry in the equipment list.</p>
+    <p class="lede">Build a piece of equipment with the wear, ranges, weapon skill tags and tags from the core book, <em>Travelers &amp; Outsiders</em> and <em>Ruins &amp; Expeditions</em>. Value and Load follow the book’s formula, minus the extra costs for ranges and expensive tags, and the result looks like an entry in the equipment list.</p>
   </header>
 
   <main>
@@ -69,13 +69,15 @@
           <h2>Range &amp; Weapon Skills</h2>
           <p class="subhead">Range</p>
           <div class="chips" id="f-ranges" role="group" aria-label="Ranges"></div>
-          <p class="hint">The first range is free; every extra range adds 1-Value. Leave all off if the item has no range.</p>
+          <p class="hint">One range per item, and it costs no Value. Click the chosen range again to clear it.</p>
 
           <p class="subhead">Weapon skill tags — core book</p>
           <div class="chips" id="f-skills-core" role="group" aria-label="Core weapon skill tags"></div>
           <p class="subhead">Weapon skill tags — Travelers &amp; Outsiders</p>
-          <div class="chips" id="f-skills-sup" role="group" aria-label="Supplement weapon skill tags"></div>
-          <p class="note">Each weapon skill tag adds 1-Value. <em>Confuse senses</em> and <em>improvise a weapon</em> need no tagged weapon, so they are not listed. <em>Hurl</em> and <em>hammerpaws</em> need none either, but some items in the books carry them.</p>
+          <div class="chips" id="f-skills-sup" role="group" aria-label="Travelers and Outsiders weapon skill tags"></div>
+          <p class="subhead">Weapon skill tags — Ruins &amp; Expeditions</p>
+          <div class="chips" id="f-skills-rne" role="group" aria-label="Ruins and Expeditions weapon skill tags"></div>
+          <p class="note">Each weapon skill tag adds 1-Value. <em>Confuse senses</em>, <em>improvise a weapon</em> and <em>frightful flourish</em> need no tagged weapon, so they are not listed. <em>Hurl</em> and <em>hammerpaws</em> need none either, but some items in the books carry them.</p>
         </div>
 
         <div class="blk" id="blk-tags">
@@ -141,7 +143,7 @@
         <h2>Preview</h2>
         <div class="card-wrap"><div id="preview-card"></div></div>
         <table class="calc" id="calc"></table>
-        <p class="formula">Boxes of Wear + Extra Ranges + Special Tags + Weapon Move Tags − Flaw Tags</p>
+        <p class="formula">Boxes of Wear + Weapon Skill Tags + Special Tags − Flaw Tags. Ranges cost no Value.</p>
         <div class="actions-col">
           <button type="button" class="btn" id="btn-save">Save to my equipment</button>
           <button type="button" class="btn ghost" id="btn-savenew" hidden>Save as new copy</button>

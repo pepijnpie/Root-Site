@@ -2,9 +2,9 @@
 
 Fan-made tools for *Root: The Roleplaying Game*, styled after the books.
 
-**Now:** Equipment creator — wear, ranges, weapon skill tags and all tags from the core book, *Travelers & Outsiders* and *Ruins & Expeditions* (113 tags, 63 pre-made items). Value and Load follow the book's formula (Boxes of Wear + Extra Ranges + Special Tags + Weapon Move Tags − Flaw Tags). Cards look like the entries in the books' equipment lists.
+**Now:** Equipment creator — wear, ranges, weapon skill tags and all tags from the core book, *Travelers & Outsiders* and *Ruins & Expeditions* (113 tags, 63 pre-made items). Value and Load follow the book's formula (Boxes of Wear + Weapon Skill Tags + Special Tags − Flaw Tags). Cards look like the entries in the books' equipment lists.
 
-House rules: no "cannot pair with" conflicts, no boss tags, and every tag is worth 1-Value (so Ripper and Specialized count 1 although the book prices them at 2). Book exceptions that stay: Luxury +4 in total, Makeshift −2, Loose Weave −2, Borrowed −6. A few pre-made items print a Value in the book that does not follow the book's own formula (Acute Razor, Ratfolk Saber, Keepers' Cuirass); the site shows the computed Value and says so under the card.
+House rules: no "cannot pair with" conflicts, no boss tags, and every tag is worth 1-Value (so Ripper and Specialized count 1 although the book prices them at 2). A weapon has one range at a time and a range costs no Value (the book adds 1 for a second range). Book exceptions that stay: Luxury +4 in total, Makeshift −2, Loose Weave −2, Borrowed −6. Pre-made items whose Value differs from the printed one (two-range items, and Acute Razor, Ratfolk Saber and Keepers' Cuirass, which do not follow the book's own formula) say so under the card.
 
 **Later:** character maker and more.
 

@@ -10,6 +10,9 @@
  * exceptions Luxury (+4 in total), Makeshift (−2), Loose Weave (−2) and
  * Borrowed (−6). Ripper and Specialized are priced 2-Value in the book but
  * count 1 here, on purpose: the site has no extra per-tag costs.
+ * A weapon has one range at a time and a range costs no Value (the book adds
+ * 1 for a second range). Book items with two ranges keep both ranges on the
+ * card, so their Value here is 1 lower than printed.
  * Tag `load` is the effect on Load: +1 / −1, or "zero" (Light).
  * Tag `detail` adds a label the user can fill in, e.g. "Ceremonial (Keepers
  * in Iron)"; `stack` lets a tag be applied more than once (Contraband).
@@ -213,7 +216,11 @@
     { id: "switch hands", src: "sup" },
     // need no tagged weapon, but items in Ruins & Expeditions carry them anyway
     { id: "hurl", src: "sup" },
-    { id: "hammerpaws", src: "sup" }
+    { id: "hammerpaws", src: "sup" },
+    // Ruins & Expeditions (Frightful Flourish is "no tag required", so it is not listed)
+    { id: "pommel strike", src: "rne" },
+    { id: "sweep", src: "rne" },
+    { id: "surprise jab", src: "rne" }
   ];
 
   /* ---------- Pre-made equipment ----------

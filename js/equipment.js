@@ -123,12 +123,12 @@
 
   /* ------------------------------------------------------------------ rules */
 
-  /*  Value = boxes of wear + extra ranges + special tags + weapon move tags − flaw tags
-      (core book p. 184).  Load = base load, changed by Weighty / Comfortable / Light. */
+  /*  Value = boxes of wear + special tags + weapon skill tags − flaw tags
+      (core book p. 184, without its extra Value for a second range: here a range is free).
+      Load = base load, changed by Weighty / Comfortable / Light. */
   function calc(item) {
     var weapon = item.type === "weapon";
     var wear = item.wear;
-    var extra = weapon ? Math.max(0, item.ranges.length - 1) : 0;
     var skills = weapon ? item.skills.length : 0;
     var special = 0, flaws = 0, loadAdj = 0, light = false;
 
@@ -140,9 +140,9 @@
       if (t.load === "zero") light = true; else if (t.load) loadAdj += t.load;
     });
 
-    var raw = wear + extra + skills + special - flaws;
+    var raw = wear + skills + special - flaws;
     return {
-      wear: wear, extra: extra, skills: skills, special: special, flaws: flaws,
+      wear: wear, skills: skills, special: special, flaws: flaws,
       raw: raw, value: Math.max(0, raw),
       load: light ? 0 : Math.max(0, item.load + loadAdj),
       weapon: weapon
@@ -277,13 +277,14 @@
 
     $("blk-weapon").hidden = draft.type !== "weapon";
 
+    // one range at a time: picking another replaces it, picking the chosen one clears it.
+    // (A book item loaded as a template can still carry two; the first click resolves that.)
     chips($("f-ranges"), RANGES, draft.ranges, function (v) {
-      toggleIn(draft.ranges, v);
-      draft.ranges = RANGES.map(function (r) { return r[0]; }).filter(function (r) { return draft.ranges.indexOf(r) >= 0; });
+      draft.ranges = draft.ranges.length === 1 && draft.ranges[0] === v ? [] : [v];
       renderControls(); refresh();
     });
 
-    ["core", "sup"].forEach(function (src) {
+    ["core", "sup", "rne"].forEach(function (src) {
       var opts = D.skills.filter(function (s) { return s.src === src; }).map(function (s) { return [s.id, cap(s.id)]; });
       chips($("f-skills-" + src), opts, draft.skills, function (v) {
         toggleIn(draft.skills, v); renderControls(); refresh();
@@ -462,7 +463,6 @@
     var c = calc(draft);
     var html = "<caption>How the Value adds up</caption>" + row("Boxes of wear", c.wear);
     if (c.weapon) {
-      html += row("Extra ranges", c.extra, c.extra ? "" : "zero");
       html += row("Weapon skill tags", c.skills, c.skills ? "" : "zero");
     }
     html += row("Special tags", signed(c.special, false), c.special ? "" : "zero");
@@ -635,9 +635,14 @@
   /* a remark under a pre-made card when the book itself is not consistent */
   function libNote(p) {
     if (p.note) return p.note;
+    var got = calc(presetItem(p)).value;
     if (p.off) {
-      return "The book prints Value " + p.book + " here, but by the book’s own formula this item comes to " +
-        calc(presetItem(p)).value + ", so that is what the site shows.";
+      return "The book prints Value " + p.book + " here, but this item’s wear, weapon skill tags and tags add up to " +
+        got + ", so that is what the site shows.";
+    }
+    if (got !== p.book) {
+      return "The book charges 1-Value for the second range. Ranges cost nothing here, so this shows Value " +
+        got + " instead of " + p.book + ".";
     }
     return "";
   }
@@ -759,8 +764,10 @@
     var known = [];   // items where the book's printed Value does not follow its own formula
     D.presets.forEach(function (p) {
       var got = calc(presetItem(p)).value;
-      if (p.off) known.push(p.name + ": book " + p.book + ", tags add up to " + got);
-      else if (got !== p.book) bad.push(p.name + ": app " + got + " vs book " + p.book);
+      // the book charges 1 Value for a second range; the site does not
+      var want = p.book - Math.max(0, p.ranges.length - 1);
+      if (p.off) known.push(p.name + ": book " + p.book + ", site " + got);
+      else if (got !== want) bad.push(p.name + ": app " + got + " vs book " + p.book + " (expected " + want + ")");
       p.tags.forEach(function (id) { if (!tagIndex[id]) bad.push(p.name + ": unknown tag " + id); });
       Object.keys(p.notes || {}).concat(Object.keys(p.counts || {})).forEach(function (id) {
         if (p.tags.indexOf(id) < 0) bad.push(p.name + ": note/count for a tag it does not have: " + id);
