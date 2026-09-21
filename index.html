@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Equipment – Root: The Roleplaying Game</title>
+  <meta name="description" content="Build Root: The RPG equipment with the tags from the core book and Travelers &amp; Outsiders. Value, Load and wear are worked out for you.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%235a2f2c'/%3E%3Cpath d='M16 5c6 4 8 10 0 22C8 15 10 9 16 5z' fill='%23d9c97a'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,700&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/root.css">
+  <link rel="stylesheet" href="css/equipment.css">
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="kicker">Root: The Roleplaying Game</div>
+    <h1 class="title">Equipment</h1>
+    <nav class="tabs" aria-label="Tools">
+      <a class="on" href="./" aria-current="page">Equipment</a>
+      <span class="soon">Characters <small>soon</small></span>
+    </nav>
+    <p class="lede">Build a piece of equipment with the wear, ranges, weapon skill tags and tags from the core book and <em>Travelers &amp; Outsiders</em>. Value and Load are worked out with the book’s formula, and the result looks like an entry in the equipment list.</p>
+  </header>
+
+  <main>
+    <!-- ===================== BUILDER ===================== -->
+    <section class="builder" id="builder" aria-label="Equipment builder">
+
+      <div class="form">
+        <div class="blk">
+          <h2>The Item</h2>
+          <div class="row2">
+            <div>
+              <label class="fld" for="f-name">Name</label>
+              <input type="text" id="f-name" maxlength="60" autocomplete="off" placeholder="Mousefolk Short Sword">
+            </div>
+            <div>
+              <span class="fld" id="f-type-l">Kind of item</span>
+              <div class="seg" id="f-type" role="group" aria-labelledby="f-type-l"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <h2>Wear &amp; Load</h2>
+          <div class="row2">
+            <div>
+              <span class="fld" id="f-wear-l">Boxes of wear</span>
+              <div class="stepper" role="group" aria-labelledby="f-wear-l">
+                <button type="button" id="wear-dec" aria-label="One box fewer">−</button>
+                <output id="wear-out" aria-live="polite">2</output>
+                <button type="button" id="wear-inc" aria-label="One box more">+</button>
+                <div class="wearpips" id="wear-pips" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div>
+              <span class="fld" id="f-load-l">Load</span>
+              <div class="seg" id="f-load" role="group" aria-labelledby="f-load-l"></div>
+            </div>
+          </div>
+          <p class="hint">Weighty, Comfortable and Light change the Load shown on the card. Most items are Load 1; small ones like a dagger are Load 0.</p>
+        </div>
+
+        <div class="blk" id="blk-weapon">
+          <h2>Range &amp; Weapon Skills</h2>
+          <p class="subhead">Range</p>
+          <div class="chips" id="f-ranges" role="group" aria-label="Ranges"></div>
+          <p class="hint">The first range is free; every extra range adds 1-Value. Leave all off if the item has no range.</p>
+
+          <p class="subhead">Weapon skill tags — core book</p>
+          <div class="chips" id="f-skills-core" role="group" aria-label="Core weapon skill tags"></div>
+          <p class="subhead">Weapon skill tags — Travelers &amp; Outsiders</p>
+          <div class="chips" id="f-skills-sup" role="group" aria-label="Supplement weapon skill tags"></div>
+          <p class="note">Each weapon skill tag adds 1-Value. <em>Confuse senses</em>, <em>improvise a weapon</em>, <em>hurl</em> and <em>hammerpaws</em> need no tagged weapon, so they are not listed.</p>
+        </div>
+
+        <div class="blk" id="blk-tags">
+          <h2>Tags</h2>
+          <div class="toolbar">
+            <div>
+              <label class="fld" for="f-search">Search</label>
+              <input type="search" id="f-search" placeholder="Name or effect, e.g. “grapple”" autocomplete="off">
+            </div>
+            <div>
+              <label class="fld" for="f-filter">Show</label>
+              <select id="f-filter">
+                <option value="all">All tags</option>
+                <option value="picked">Picked for this item</option>
+                <option value="pos">Positive tags</option>
+                <option value="neg">Negative tags</option>
+                <option value="core">Core book</option>
+                <option value="sup">Travelers &amp; Outsiders</option>
+                <option value="custom">My own tags</option>
+              </select>
+            </div>
+          </div>
+          <p class="count" id="tag-count" aria-live="polite"></p>
+          <div id="tag-list"></div>
+
+          <details class="own" id="own">
+            <summary id="own-sum">Invent your own tag</summary>
+            <form class="own-form" id="own-form" autocomplete="off">
+              <div class="line">
+                <div>
+                  <label class="fld" for="o-name">Tag name</label>
+                  <input type="text" id="o-name" maxlength="40" required>
+                </div>
+                <div>
+                  <label class="fld" for="o-value">Value</label>
+                  <input type="number" id="o-value" min="1" max="6" value="1">
+                </div>
+              </div>
+              <div>
+                <span class="fld" id="o-kind-l">Kind</span>
+                <div class="seg" id="o-kind" role="group" aria-labelledby="o-kind-l"></div>
+              </div>
+              <div>
+                <label class="fld" for="o-text">What it does</label>
+                <textarea id="o-text" maxlength="600" required></textarea>
+                <p class="hint">Put *asterisks* around a move name to print it in italics, like the book does.</p>
+              </div>
+              <div>
+                <label class="fld" for="o-applies">Suited to (optional)</label>
+                <input type="text" id="o-applies" maxlength="60" placeholder="Bow, crossbow">
+              </div>
+              <div class="actions">
+                <button type="submit" class="btn" id="o-save">Save tag</button>
+                <button type="button" class="btn ghost" id="o-cancel">Clear</button>
+              </div>
+            </form>
+          </details>
+        </div>
+      </div>
+
+      <aside class="preview" aria-label="Preview">
+        <h2>Preview</h2>
+        <div class="card-wrap"><div id="preview-card"></div></div>
+        <table class="calc" id="calc"></table>
+        <p class="formula">Boxes of Wear + Extra Ranges + Special Tags + Weapon Move Tags − Flaw Tags</p>
+        <div class="actions-col">
+          <button type="button" class="btn" id="btn-save">Save to my equipment</button>
+          <button type="button" class="btn ghost" id="btn-savenew" hidden>Save as new copy</button>
+          <button type="button" class="btn ghost" id="btn-copy">Copy as text</button>
+          <button type="button" class="btn ghost" id="btn-new">Start over</button>
+        </div>
+        <p class="status" id="status" role="status"></p>
+      </aside>
+    </section>
+
+    <div class="leafband" aria-hidden="true"></div>
+
+    <!-- ===================== SAVED ===================== -->
+    <section id="saved" aria-label="My equipment">
+      <div class="section-head">
+        <div>
+          <h2>My Equipment</h2>
+          <p>Saved in this browser. Click the white boxes to mark wear while you play.</p>
+        </div>
+        <div class="tools">
+          <button type="button" class="btn ghost small" id="btn-export">Export</button>
+          <button type="button" class="btn ghost small" id="btn-import">Import</button>
+          <button type="button" class="btn ghost small" id="btn-print">Print</button>
+          <button type="button" class="btn ghost small" id="btn-clear">Delete all</button>
+          <input type="file" id="file-import" accept="application/json,.json" hidden>
+        </div>
+      </div>
+      <div class="flow" id="saved-list"></div>
+    </section>
+
+    <div class="leafband" aria-hidden="true"></div>
+
+    <!-- ===================== LIBRARY ===================== -->
+    <section id="library" aria-label="Pre-made equipment">
+      <div class="section-head">
+        <div>
+          <h2>Pre-Made Equipment</h2>
+          <p>The equipment lists from the books. Use one as a template to change it, or add it to your list as it is.</p>
+        </div>
+        <div class="seg lib-tabs" id="lib-tabs" role="group" aria-label="Book"></div>
+      </div>
+      <div id="lib-list"></div>
+    </section>
+  </main>
+
+  <footer class="folio">
+    Root: The Roleplaying Game · Equipment
+    <small>Unofficial fan tool. <em>Root: The Roleplaying Game</em> and <em>Travelers &amp; Outsiders</em> are by Magpie Games and Leder Games; the rules text, tags and look on this page belong to their creators. Your saved equipment stays in your own browser.</small>
+  </footer>
+</div>
+
+<div class="dock" id="dock">
+  <div class="dv">Value <b id="dock-value">0</b></div>
+  <button type="button" class="btn" id="dock-save">Save</button>
+</div>
+
+<noscript><p style="padding:24px;font-family:sans-serif">This page needs JavaScript to build equipment.</p></noscript>
+
+<script src="js/data.js"></script>
+<script src="js/equipment.js"></script>
+</body>
+</html>
